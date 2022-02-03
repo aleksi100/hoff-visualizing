@@ -3,35 +3,39 @@ const values_div = document.querySelector('.values');
 
 
 let NODES = {};
+let max_debth = 0;
 class Node{
   constructor(letter, i){
     this.letter = letter.toString()
     this.freq = 1
     this.id = Math.random()
     this.x = (1+i)*60
-    this.y = 200
+    this.y = 100
     this.used = false
     this.left = 0
     this.right = 0
     this.debth = 0
   }
-  show(i){
-    console.log(this.debth)
-    this.y += 60*this.debth
-    this.x = i
+  show(){
+    
+    
     var div = document.createElement("div")
     var l = document.createElement("p");
-
     l.textContent = this.letter
-    
     div.appendChild(l);
     div.setAttribute("id", this.id)
+
+    if(this.left != 0){
+      div.setAttribute("class", "node")
+    }else{
+      div.setAttribute("class", "letter")
+    }
     div.style.top = this.y+"px";
     div.style.left = this.x+"px";
     values_div.appendChild(div);
   }
   unShow(){
-    console.log(this.id)
+    
     let elm = document.getElementById(this.id)
     
     values_div.removeChild(elm)
@@ -60,19 +64,25 @@ function make_tree(){
     return 1 // tree is complete
   }
   NODES[toka].used = true
-
-  parent = new Node(NODES[eka].freq+NODES[toka].freq, Object.keys(NODES).length)
+  let freq = NODES[eka].freq+NODES[toka].freq
+  parent = new Node(freq, Object.keys(NODES).length)
   parent.left = NODES[eka].id
   parent.right = NODES[toka].id
+  parent.freq = freq
   NODES[parent.id] = parent
 }
 
 function show_all(node, i){
-  console.log("node: ",node)
-  NODES[node].show(i)
+  let nd = NODES[node].debth
+  let gap = max_debth-nd
+
+
+  NODES[node].x = i
+  NODES[node].y += 70*nd
+  NODES[node].show()
   if(NODES[node].left == 0) return
-  show_all(NODES[node].left, i-60)
-  show_all(NODES[node].right, i+60)
+  show_all(NODES[node].left, i-50*gap)
+  show_all(NODES[node].right, i+50*gap)
 }
 
 
@@ -80,7 +90,8 @@ function show_all(node, i){
 
 
 function set_debth(node, debth){
-  
+  max_debth = Math.max(max_debth, debth)
+  console.log(max_debth)
   // check
   NODES[node].debth = debth
   if(NODES[node].left == 0) return
@@ -95,7 +106,7 @@ function set_debth(node, debth){
 input.addEventListener('input', updateValue);
 
 function updateValue(e) {
-  
+  max_debth = 0
   for(i in NODES){
     NODES[i].unShow();
   }
@@ -129,7 +140,7 @@ function updateValue(e) {
     }
   }else{
     for(i in NODES){
-      NODES[i].show(i*60+100)
+      NODES[i].show()
     }
   }
 
